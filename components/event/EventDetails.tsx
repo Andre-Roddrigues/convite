@@ -36,7 +36,7 @@ export default function EventDetails({ event }: Props) {
               Horário
             </p>
             <p className="text-gray-700 font-light text-lg">
-              {event.time}
+              13:30
             </p>
           </div>
         </div>
@@ -48,7 +48,7 @@ export default function EventDetails({ event }: Props) {
               Local
             </p>
             <p className="text-gray-700 font-light text-lg">
-              {event.location}
+              Vila Esperança, Mozal - Casa 60
             </p>
           </div>
         </div>
