@@ -2,11 +2,12 @@
 
 import { confirmPresence } from "@/services/rsvp.service";
 import { useState } from "react";
+import toast from "react-hot-toast";
 import Button from "../ui/Button";
 import Input from "../ui/Input";
 import AttendanceSelector from "./AttendanceSelector";
 import MessageField from "./MessageField";
-import { Heart, Phone, User, CheckCircle,  } from "lucide-react";
+import { Heart, Phone, User, CheckCircle } from "lucide-react";
 
 interface Props {
   eventId: string;
@@ -18,15 +19,28 @@ export default function RSVPForm({ eventId }: Props) {
   const [attendance, setAttendance] = useState<"yes" | "no">("yes");
   const [message, setMessage] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [showSuccess, setShowSuccess] = useState(false);
 
   async function handleSubmit() {
     if (!fullName || !phone) {
-      alert("Por favor, preencha seu nome e telefone!");
+      toast.error("Por favor, preencha seu nome e telefone!", {
+        style: {
+          background: '#fee2e2',
+          color: '#991b1b',
+          border: '1px solid #fecaca'
+        },
+        icon: '❤️'
+      });
       return;
     }
 
     setIsSubmitting(true);
+    
+    const loadingToast = toast.loading('Confirmando sua presença...', {
+      style: {
+        background: '#fef9c3',
+        color: '#854d0e',
+      }
+    });
     
     try {
       await confirmPresence({
@@ -37,17 +51,33 @@ export default function RSVPForm({ eventId }: Props) {
         message
       });
 
-      setShowSuccess(true);
-      setTimeout(() => setShowSuccess(false), 3000);
+      toast.success('Presença confirmada com sucesso! ❤️', {
+        id: loadingToast,
+        duration: 4000,
+        style: {
+          background: '#fce7f3',
+          color: '#9d174d',
+          border: '1px solid #fbcfe8'
+        },
+        icon: '💒'
+      });
       
-      // Limpar formulário
       setFullName("");
       setPhone("");
       setAttendance("yes");
       setMessage("");
+      
     } catch {
-      // Usando _ para indicar que o parâmetro não é usado intencionalmente
-      alert("Ops! Algo deu errado. Tente novamente.");
+      toast.error('Ops! Algo deu errado. Tente novamente.', {
+        id: loadingToast,
+        duration: 4000,
+        style: {
+          background: '#fee2e2',
+          color: '#991b1b',
+          border: '1px solid #fecaca'
+        },
+        icon: '😢'
+      });
     } finally {
       setIsSubmitting(false);
     }
@@ -68,13 +98,6 @@ export default function RSVPForm({ eventId }: Props) {
           Sua presença é o nosso presente
         </p>
       </div>
-
-      {showSuccess && (
-        <div className="mb-6 p-4 bg-green-50 border border-green-200 rounded-xl flex items-center gap-3 text-green-700 animate-fade-in">
-          <CheckCircle className="w-5 h-5 text-green-500" />
-          <p className="text-sm font-medium">Presença confirmada com sucesso! ❤️</p>
-        </div>
-      )}
 
       <div className="space-y-5">
         <div className="space-y-4">
