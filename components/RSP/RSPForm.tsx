@@ -1,4 +1,3 @@
-// RSVPForm.tsx
 "use client";
 
 import { confirmPresence } from "@/services/rsvp.service";
@@ -7,7 +6,7 @@ import Button from "../ui/Button";
 import Input from "../ui/Input";
 import AttendanceSelector from "./AttendanceSelector";
 import MessageField from "./MessageField";
-import { Heart, Phone, User, CheckCircle } from "lucide-react";
+import { Heart, Phone, User, CheckCircle,  } from "lucide-react";
 
 interface Props {
   eventId: string;
@@ -46,7 +45,8 @@ export default function RSVPForm({ eventId }: Props) {
       setPhone("");
       setAttendance("yes");
       setMessage("");
-    } catch (error) {
+    } catch {
+      // Usando _ para indicar que o parâmetro não é usado intencionalmente
       alert("Ops! Algo deu errado. Tente novamente.");
     } finally {
       setIsSubmitting(false);

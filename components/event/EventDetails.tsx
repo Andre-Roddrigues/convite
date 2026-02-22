@@ -56,7 +56,7 @@ export default function EventDetails({ event }: Props) {
 
       <div className="mt-6 pt-4 text-center border-t border-rose-100">
         <p className="text-xs text-rose-300 italic">
-          "Celebre o amor em cada detalhe"
+          Celebre o amor em cada detalhe
         </p>
       </div>
     </div>
