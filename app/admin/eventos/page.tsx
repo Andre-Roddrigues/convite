@@ -1,102 +1,128 @@
-// app/admin/page.tsx
 "use client";
 
 import { useState, useEffect } from "react";
 import { Heart, Users, Calendar, MessageCircle } from "lucide-react";
-import SidebarMobile from "@/components/Sidebar/SidebarMobile";
 
-// Dados mockados para teste
-const mockEvents = [
-  {
-    id: "1",
-    title: "Cerimônia de Casamento",
-    description: "Celebre connosco este momento especial ❤️",
-    date: "2025-10-25",
-    time: "13:30",
-    location: "Vila Esperança, Mozal - Casa 60",
-    createdAt: new Date().toISOString()
-  }
-];
+interface Event {
+  id: string;
+  title: string;
+  date: string;
+  createdAt: string;
+}
 
-const mockRsvps = [
-  {
-    eventId: "1",
-    fullName: "João Silva",
-    phone: "84 123 456",
-    attendance: "yes" as const,
-    message: "Mal posso esperar!",
-    createdAt: new Date().toISOString()
-  }
-];
+interface RSVP {
+  id: string;
+  eventId: string;
+  fullName: string;
+  phone: string;
+  attendance: "yes" | "no";
+  message?: string;
+  createdAt: string;
+}
 
 export default function AdminDashboard() {
-  const [events] = useState(mockEvents);
-  const [rsvps] = useState(mockRsvps);
+  const [events, setEvents] = useState<Event[]>([]);
+  const [rsvps, setRsvps] = useState<RSVP[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    async function loadData() {
+      try {
+        const [eventsRes, rsvpsRes] = await Promise.all([
+          fetch("/api/events", { cache: "no-store" }),
+          fetch("/api/rsvps", { cache: "no-store" }),
+        ]);
+
+        const eventsData = await eventsRes.json();
+        const rsvpsData = await rsvpsRes.json();
+
+        setEvents(eventsData);
+        setRsvps(rsvpsData);
+      } catch (error) {
+        console.error("Erro ao carregar dashboard:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    }
+
+    loadData();
+  }, []);
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <p className="text-rose-400">Carregando dashboard...</p>
+      </div>
+    );
+  }
 
   const totalConfirmations = rsvps.length;
   const confirmationsYes = rsvps.filter(r => r.attendance === "yes").length;
   const totalEvents = events.length;
-  const messagesCount = rsvps.filter(r => r.message).length;
+  const messagesCount = rsvps.filter(r => r.message && r.message.trim() !== "").length;
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-rose-50 to-white">
-      {/* Sidebar Mobile */}
-      {/* <SidebarMobile /> */}
-      
-      {/* Conteúdo principal */}
-      <main className="lg:ml-64 p-4 lg:p-8 pb-24 lg:pb-8">
-        {/* Header */}
+      <main className="p-4 lg:p-8">
         <div className="mb-8">
           <h1 className="font-serif text-3xl lg:text-4xl text-rose-800 mb-2">
             Dashboard do Casamento
           </h1>
           <p className="text-rose-300">
-            Bem-vinda ao painel administrativo do seu casamento
+            Painel administrativo com dados em tempo real
           </p>
         </div>
 
-        {/* Cards de estatísticas */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-          <div className="bg-white/90 backdrop-blur-sm p-4 lg:p-6 rounded-2xl border border-rose-100/50">
-            <div className="flex items-center justify-between mb-2 lg:mb-4">
-              <Heart className="w-6 lg:w-8 h-6 lg:h-8 text-rose-400 fill-rose-400" />
-              <span className="text-2xl lg:text-3xl font-serif text-rose-800">{totalConfirmations}</span>
+          
+          <div className="bg-white p-6 rounded-2xl border border-rose-100">
+            <div className="flex items-center justify-between mb-4">
+              <Heart className="w-8 h-8 text-rose-400 fill-rose-400" />
+              <span className="text-3xl font-serif text-rose-800">
+                {totalConfirmations}
+              </span>
             </div>
-            <p className="text-xs lg:text-sm text-rose-300">Total de confirmações</p>
+            <p className="text-sm text-rose-300">Total de confirmações</p>
           </div>
 
-          <div className="bg-white/90 backdrop-blur-sm p-4 lg:p-6 rounded-2xl border border-rose-100/50">
-            <div className="flex items-center justify-between mb-2 lg:mb-4">
-              <Users className="w-6 lg:w-8 h-6 lg:h-8 text-green-400" />
-              <span className="text-2xl lg:text-3xl font-serif text-green-700">{confirmationsYes}</span>
+          <div className="bg-white p-6 rounded-2xl border border-rose-100">
+            <div className="flex items-center justify-between mb-4">
+              <Users className="w-8 h-8 text-green-500" />
+              <span className="text-3xl font-serif text-green-700">
+                {confirmationsYes}
+              </span>
             </div>
-            <p className="text-xs lg:text-sm text-rose-300">Confirmaram presença</p>
+            <p className="text-sm text-rose-300">Confirmaram presença</p>
           </div>
 
-          <div className="bg-white/90 backdrop-blur-sm p-4 lg:p-6 rounded-2xl border border-rose-100/50">
-            <div className="flex items-center justify-between mb-2 lg:mb-4">
-              <Calendar className="w-6 lg:w-8 h-6 lg:h-8 text-rose-400" />
-              <span className="text-2xl lg:text-3xl font-serif text-rose-800">{totalEvents}</span>
+          <div className="bg-white p-6 rounded-2xl border border-rose-100">
+            <div className="flex items-center justify-between mb-4">
+              <Calendar className="w-8 h-8 text-rose-400" />
+              <span className="text-3xl font-serif text-rose-800">
+                {totalEvents}
+              </span>
             </div>
-            <p className="text-xs lg:text-sm text-rose-300">Eventos programados</p>
+            <p className="text-sm text-rose-300">Eventos programados</p>
           </div>
 
-          <div className="bg-white/90 backdrop-blur-sm p-4 lg:p-6 rounded-2xl border border-rose-100/50">
-            <div className="flex items-center justify-between mb-2 lg:mb-4">
-              <MessageCircle className="w-6 lg:w-8 h-6 lg:h-8 text-rose-400" />
-              <span className="text-2xl lg:text-3xl font-serif text-rose-800">{messagesCount}</span>
+          <div className="bg-white p-6 rounded-2xl border border-rose-100">
+            <div className="flex items-center justify-between mb-4">
+              <MessageCircle className="w-8 h-8 text-rose-400" />
+              <span className="text-3xl font-serif text-rose-800">
+                {messagesCount}
+              </span>
             </div>
-            <p className="text-xs lg:text-sm text-rose-300">Mensagens recebidas</p>
+            <p className="text-sm text-rose-300">Mensagens recebidas</p>
           </div>
+
         </div>
 
-        {/* Conteúdo temporário */}
-        <div className="bg-white/90 backdrop-blur-sm rounded-2xl border border-rose-100/50 p-6">
+        <div className="bg-white rounded-2xl border border-rose-100 p-6">
           <h2 className="font-serif text-xl text-rose-800 mb-4">
-            Bem-vinda ao painel administrativo
+            Sistema conectado ao banco de dados
           </h2>
           <p className="text-gray-600">
-            Aqui você poderá gerenciar todas as confirmações, eventos e mensagens do seu casamento.
+            Todos os dados exibidos aqui são carregados em tempo real do banco através do Prisma.
           </p>
         </div>
       </main>

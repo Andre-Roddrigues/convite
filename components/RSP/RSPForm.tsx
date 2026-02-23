@@ -7,7 +7,7 @@ import Button from "../ui/Button";
 import Input from "../ui/Input";
 import AttendanceSelector from "./AttendanceSelector";
 import MessageField from "./MessageField";
-import { Heart, Phone, User, CheckCircle } from "lucide-react";
+import { Heart, Phone, User } from "lucide-react";
 
 interface Props {
   eventId: string;
@@ -43,13 +43,16 @@ export default function RSVPForm({ eventId }: Props) {
     });
     
     try {
-      await confirmPresence({
+      // Chamada à API
+      const result = await confirmPresence({
         eventId,
         fullName,
         phone,
         attendance,
         message
       });
+
+      console.log('Resposta da API:', result); // Para debug
 
       toast.success('Presença confirmada com sucesso! ❤️', {
         id: loadingToast,
@@ -62,12 +65,15 @@ export default function RSVPForm({ eventId }: Props) {
         icon: '💒'
       });
       
+      // Limpar formulário
       setFullName("");
       setPhone("");
       setAttendance("yes");
       setMessage("");
       
-    } catch {
+    } catch (error) {
+      console.error('Erro detalhado:', error);
+      
       toast.error('Ops! Algo deu errado. Tente novamente.', {
         id: loadingToast,
         duration: 4000,

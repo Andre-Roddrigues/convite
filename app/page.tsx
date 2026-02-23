@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useState } from "react";
-
 import { Event } from "@/types/events";
 import { getEvents } from "@/services/event.service";
 import EventDetails from "@/components/event/EventDetails";
@@ -14,17 +13,25 @@ export default function Home() {
   useEffect(() => {
     async function load() {
       const data = await getEvents();
-      setEvent(data[0]); // pegando primeiro evento
+      if (data.length > 0) {
+        setEvent(data[0]);
+      }
     }
     load();
   }, []);
 
-  if (!event) return <p>Carregando...</p>;
+  if (!event) {
+    return (
+      <div className="min-h-screen bg-rose-50 flex items-center justify-center">
+        <p className="text-rose-400">Carregando evento...</p>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-rose-50 flex flex-col items-center p-6">
-      <EventHeader title={event.title} />
-      <EventDetails event={event} />
+      <EventHeader />
+      <EventDetails eventId={event.id} />
       <RSVPForm eventId={event.id} />
     </div>
   );

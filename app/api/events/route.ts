@@ -1,39 +1,42 @@
 import { NextResponse } from "next/server";
-import { events } from "../../../lib/db";
-import { Event } from "../../../types/events";
-
 import { prisma } from "@/src/lib/prisma";
 
 export async function GET() {
-  return NextResponse.json(events);
+  try {
+    const events = await prisma.event.findMany({
+      orderBy: {
+        createdAt: "desc",
+      },
+    });
+
+    return NextResponse.json(events);
+  } catch (error) {
+    return NextResponse.json(
+      { message: "Erro ao buscar eventos" },
+      { status: 500 }
+    );
+  }
 }
 
 export async function POST(request: Request) {
-  const body = await request.json();
+  try {
+    const body = await request.json();
 
-  const newEvent: Event = {
-    id: Date.now().toString(),
-    title: body.title,
-    description: body.description,
-    date: body.date,
-    time: body.time,
-    location: body.location,
-    createdAt: new Date().toISOString()
-  };
+    const newEvent = await prisma.event.create({
+      data: {
+        title: body.title,
+        description: body.description,
+        date: body.date,
+        time: body.time,
+        location: body.location,
+      },
+    });
 
-  await prisma.event.create({
-    data: {
-      id: newEvent.id,
-      title: newEvent.title,
-      description: newEvent.description,
-      date: newEvent.date,
-      time: newEvent.time,
-      location: newEvent.location,
-      createdAt: newEvent.createdAt
-    }
-  });
-
-  events.push(newEvent);
-
-  return NextResponse.json(newEvent, { status: 201 });
+    return NextResponse.json(newEvent, { status: 201 });
+  } catch (error) {
+    return NextResponse.json(
+      { message: "Erro ao criar evento" },
+      { status: 500 }
+    );
+  }
 }

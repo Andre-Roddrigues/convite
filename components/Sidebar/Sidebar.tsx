@@ -18,10 +18,8 @@ export default function Sidebar() {
 
   const menuItems = [
     { icon: Home, label: "Dashboard", href: "/admin" },
-    { icon: Calendar, label: "Eventos", href: "/admin/events" },
-    { icon: Users, label: "Confirmações", href: "/admin/confirmations" },
-    { icon: Bell, label: "Notificações", href: "/admin/notifications" },
-    { icon: Settings, label: "Configurações", href: "/admin/settings" },
+    { icon: Calendar, label: "Eventos", href: "/admin/evento" },
+    { icon: Users, label: "Confirmações", href: "/admin/confirmar" },
   ];
 
   return (
