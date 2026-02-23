@@ -65,7 +65,6 @@ export default function RSVPForm({ eventId }: Props) {
         icon: '💒'
       });
       
-      // Limpar formulário
       setFullName("");
       setPhone("");
       setAttendance("yes");
